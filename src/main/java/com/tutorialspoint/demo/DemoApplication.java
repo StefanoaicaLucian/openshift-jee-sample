@@ -1,5 +1,6 @@
 package com.tutorialspoint.demo;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -60,12 +61,6 @@ public class DemoApplication extends SpringBootServletInitializer {
         return list;
     }
 
-    @RequestMapping(value = "/test", method = RequestMethod.GET)
-    public String test() {
-        return "TESTING";
-    }
-
-
     @RequestMapping(value = "/fetchData", method = RequestMethod.POST)
     public PageResponse fetchData(@RequestBody PageRequest request) {
         Page<Message> page = messageRepository.findAll(new org.springframework.data.domain.PageRequest(
@@ -104,26 +99,40 @@ public class DemoApplication extends SpringBootServletInitializer {
     }
 
     @PostMapping(value = "/upload")
-    public String fileUpload(@RequestParam("file") MultipartFile file) throws IOException {
-        String workingDirectory = "C:/Users/Florian-LucianStefan/Desktop/uploads/";
-
-        File convertFile = new File(workingDirectory + file.getOriginalFilename());
-        convertFile.createNewFile();
+    public ImageContent fileUpload(@RequestParam("file") MultipartFile file) throws IOException {
+        File imageFile = new File(file.getOriginalFilename());
+        imageFile.createNewFile();
 
 
-        FileOutputStream fout = new FileOutputStream(convertFile);
+        FileOutputStream fout = new FileOutputStream(imageFile);
         fout.write(file.getBytes());
         fout.close();
 
+        String imageFilePath = imageFile.getAbsolutePath();
 
-        String command = "tesseract " + workingDirectory + file.getOriginalFilename() + " " + workingDirectory + file.getOriginalFilename();
+        String textFilePath = imageFilePath.substring(0, imageFilePath.indexOf("."));
+
+        String command = "tesseract " + imageFilePath + " " + textFilePath;
 
         System.out.println(command);
-
         executeCommand(command);
+        System.out.println("Done!");
 
+        File textFile = new File(textFilePath + ".txt");
 
-        return "File is upload successfully";
+        List<String> lines = FileUtils.readLines(textFile, "UTF-8");
+
+        StringBuilder buffer = new StringBuilder();
+        for (String line: lines) {
+            buffer.append(line);
+        }
+
+        imageFile.delete();
+        textFile.delete();
+
+        ImageContent content = new ImageContent();
+        content.setText(buffer.toString());
+        return content;
     }
 
     private String executeCommand(String command) {
