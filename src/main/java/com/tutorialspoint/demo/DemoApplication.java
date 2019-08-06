@@ -34,7 +34,7 @@ public class DemoApplication extends SpringBootServletInitializer {
     @Autowired
     private MessageRepository messageRepository;
 
-    @CrossOrigin(origins = "http://localhost:4200")
+    @CrossOrigin
     @GetMapping(path = "/add")
     public @ResponseBody
     String addNewUser(@RequestParam String name, @RequestParam String email) {
@@ -46,14 +46,14 @@ public class DemoApplication extends SpringBootServletInitializer {
         return "Saved";
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
+    @CrossOrigin
     @GetMapping(path = "/all")
     public @ResponseBody
     Iterable<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
+    @CrossOrigin
     @RequestMapping(value = "/getTheMessages", method = RequestMethod.GET)
     public List<Message> hello() {
         List<Message> list = new ArrayList<>();
@@ -64,7 +64,7 @@ public class DemoApplication extends SpringBootServletInitializer {
         return list;
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
+    @CrossOrigin
     @RequestMapping(value = "/fetchData", method = RequestMethod.POST)
     public PageResponse fetchData(@RequestBody PageRequest request) {
         Page<Message> page = messageRepository.findAll(new org.springframework.data.domain.PageRequest(
@@ -85,13 +85,13 @@ public class DemoApplication extends SpringBootServletInitializer {
         return response;
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
+    @CrossOrigin
     @RequestMapping(value = "/messages", method = RequestMethod.POST)
     public void createMessage(@RequestBody Message message) {
         messageRepository.save(message);
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
+    @CrossOrigin
     @PutMapping(value = "/delete")
     public void deleteMessages(@RequestBody List<Integer> ids) {
         for (Integer id : ids) {
@@ -99,13 +99,13 @@ public class DemoApplication extends SpringBootServletInitializer {
         }
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
+    @CrossOrigin
     @PutMapping(value = "/update")
     public void updateMessage(@RequestBody Message message) {
         messageRepository.save(message);
     }
 
-    @CrossOrigin(origins = "http://localhost:4200")
+    @CrossOrigin
     @PostMapping(value = "/upload")
     public ImageContent fileUpload(@RequestParam("file") MultipartFile file) throws IOException {
         File imageFile = new File(file.getOriginalFilename());
