@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+@CrossOrigin
 @SpringBootApplication
 @RestController
 public class DemoApplication extends SpringBootServletInitializer {
@@ -34,7 +35,6 @@ public class DemoApplication extends SpringBootServletInitializer {
     @Autowired
     private MessageRepository messageRepository;
 
-    @CrossOrigin(origins = "http://ng7-jee-sample.apps.us-east-1.online-starter.openshift.com:8080")
     @GetMapping(path = "/add")
     public @ResponseBody
     String addNewUser(@RequestParam String name, @RequestParam String email) {
@@ -46,14 +46,12 @@ public class DemoApplication extends SpringBootServletInitializer {
         return "Saved";
     }
 
-    @CrossOrigin(origins = "http://ng7-jee-sample.apps.us-east-1.online-starter.openshift.com:8080")
     @GetMapping(path = "/all")
     public @ResponseBody
     Iterable<User> getAllUsers() {
         return userRepository.findAll();
     }
 
-    @CrossOrigin(origins = "http://ng7-jee-sample.apps.us-east-1.online-starter.openshift.com:8080")
     @RequestMapping(value = "/getTheMessages", method = RequestMethod.GET)
     public List<Message> hello() {
         List<Message> list = new ArrayList<>();
@@ -64,7 +62,6 @@ public class DemoApplication extends SpringBootServletInitializer {
         return list;
     }
 
-    @CrossOrigin(origins = "http://ng7-jee-sample.apps.us-east-1.online-starter.openshift.com:8080")
     @RequestMapping(value = "/fetchData", method = RequestMethod.POST)
     public PageResponse fetchData(@RequestBody PageRequest request) {
         Page<Message> page = messageRepository.findAll(new org.springframework.data.domain.PageRequest(
@@ -85,13 +82,11 @@ public class DemoApplication extends SpringBootServletInitializer {
         return response;
     }
 
-    @CrossOrigin(origins = "http://ng7-jee-sample.apps.us-east-1.online-starter.openshift.com:8080")
     @RequestMapping(value = "/messages", method = RequestMethod.POST)
     public void createMessage(@RequestBody Message message) {
         messageRepository.save(message);
     }
 
-    @CrossOrigin(origins = "http://ng7-jee-sample.apps.us-east-1.online-starter.openshift.com:8080")
     @PutMapping(value = "/delete")
     public void deleteMessages(@RequestBody List<Integer> ids) {
         for (Integer id : ids) {
@@ -99,13 +94,11 @@ public class DemoApplication extends SpringBootServletInitializer {
         }
     }
 
-    @CrossOrigin(origins = "http://ng7-jee-sample.apps.us-east-1.online-starter.openshift.com:8080")
     @PutMapping(value = "/update")
     public void updateMessage(@RequestBody Message message) {
         messageRepository.save(message);
     }
 
-    @CrossOrigin(origins = "http://ng7-jee-sample.apps.us-east-1.online-starter.openshift.com:8080")
     @PostMapping(value = "/upload")
     public ImageContent fileUpload(@RequestParam("file") MultipartFile file) throws IOException {
         File imageFile = new File(file.getOriginalFilename());
@@ -131,7 +124,7 @@ public class DemoApplication extends SpringBootServletInitializer {
         List<String> lines = FileUtils.readLines(textFile, "UTF-8");
 
         StringBuilder buffer = new StringBuilder();
-        for (String line: lines) {
+        for (String line : lines) {
             buffer.append(line);
         }
 
