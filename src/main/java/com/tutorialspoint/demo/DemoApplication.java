@@ -1,5 +1,7 @@
 package com.tutorialspoint.demo;
 
+import net.sourceforge.tess4j.Tesseract;
+import net.sourceforge.tess4j.TesseractException;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -116,31 +118,31 @@ public class DemoApplication extends SpringBootServletInitializer {
         fout.write(file.getBytes());
         fout.close();
 
-        String imageFilePath = imageFile.getAbsolutePath();
-
-        String textFilePath = imageFilePath.substring(0, imageFilePath.indexOf("."));
-
-        String command = "tesseract " + imageFilePath + " " + textFilePath;
-
-        System.out.println(command);
-        executeCommand(command);
-        System.out.println("Done!");
-
-        File textFile = new File(textFilePath + ".txt");
-
-        List<String> lines = FileUtils.readLines(textFile, "UTF-8");
-
-        StringBuilder buffer = new StringBuilder();
-        for (String line : lines) {
-            buffer.append(line);
-        }
+        String text = executeTesseract(imageFile);
 
         imageFile.delete();
-        textFile.delete();
 
         ImageContent content = new ImageContent();
-        content.setText(buffer.toString());
+        content.setText(text);
         return content;
+    }
+
+    private String executeTesseract(File imageFile) {
+        Tesseract instance = new Tesseract();
+
+        instance.setDatapath("/home/jboss/tessdata");
+        instance.setLanguage("eng");
+
+        String result = "";
+
+        try {
+            result = instance.doOCR(imageFile);
+
+        } catch (TesseractException e) {
+            result = e.getMessage();
+        }
+
+        return result;
     }
 
     private String executeCommand(String command) {
