@@ -12,6 +12,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -109,28 +111,43 @@ public class DemoApplication extends SpringBootServletInitializer {
 
     @CrossOrigin
     @PostMapping(value = "/upload")
-    public ImageContent fileUpload(@RequestParam("file") MultipartFile file) throws IOException {
-        File imageFile = new File(file.getOriginalFilename());
-        imageFile.createNewFile();
+    public ImageContent fileUpload(@RequestParam("file") MultipartFile file) {
+        BufferedImage img;
+        try {
+            /*
+                File imageFile = new File(file.getOriginalFilename());
+                imageFile.createNewFile();
 
 
-        FileOutputStream fout = new FileOutputStream(imageFile);
-        fout.write(file.getBytes());
-        fout.close();
 
-        String text = executeTesseract(imageFile);
 
-        imageFile.delete();
+                FileOutputStream fout = new FileOutputStream(imageFile);
+                fout.write(file.getBytes());
+                fout.close();
+
+             */
+
+            img = ImageIO.read(file.getInputStream());
+
+        } catch (IOException e) {
+            ImageContent tmp = new ImageContent();
+            tmp.setText(e.getMessage());
+            return tmp;
+        }
+
+
+        String text = executeTesseract(img);
+
 
         ImageContent content = new ImageContent();
         content.setText(text);
         return content;
     }
 
-    private String executeTesseract(File imageFile) {
+    private String executeTesseract(BufferedImage imageFile) {
         Tesseract instance = new Tesseract();
 
-        instance.setDatapath("/home/jboss/tessdata");
+        instance.setDatapath("/usr/share/tesseract-ocr/4.00/tessdata");
         instance.setLanguage("eng");
 
         String result = "";
@@ -143,30 +160,5 @@ public class DemoApplication extends SpringBootServletInitializer {
         }
 
         return result;
-    }
-
-    private String executeCommand(String command) {
-        StringBuilder output = new StringBuilder();
-
-        Process process;
-        try {
-            process = Runtime.getRuntime().exec(command);
-            process.waitFor();
-
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-
-
-            String line;
-
-            while ((line = reader.readLine()) != null) {
-                output.append(line);
-                output.append("\n");
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return output.toString();
     }
 }
